@@ -27,6 +27,14 @@ struct MovieDetails: View {
                     StorySection()
                     
                     Spacer().frame(height: 32)
+                    
+                    RatingSection()
+                    
+                    Divider()
+                        .background(Color.gray)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .padding(.bottom, 8)
                 }
             }
         }
@@ -118,6 +126,20 @@ struct StorySection: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
    
+        }
+    }
+}
+
+struct RatingSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("IMDb Rating")
+                .font(.system(size: 18, weight: .semibold))
+    
+            Text("9.3 / 10")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("greyish"))
+    
         }
     }
 }
