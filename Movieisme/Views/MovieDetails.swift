@@ -12,37 +12,45 @@ struct MovieDetails: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    ZStack {
-                        Image("Shawshankscoverimage")
-                            .resizable()
-                            .scaledToFill()
-                            .padding(.top, -80)
-                        
-
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.black.opacity(0.9),
-                                Color.black.opacity(0)
-                            ]),
-                            startPoint: .bottom,
-                            endPoint: .top
-                        )
-                    }
+                    
+                    CoverImage()
                     
                     Text("Shawshank")
-                        .font(.system(size: 28, weight: .bold))
-                      
-                    
+                      .font(.system(size: 28, weight: .bold))
+       
                     Spacer().frame(height: 40)
-
+                    
                     MoivesOverview()
-                        
-                    }
+             
+                    Spacer().frame(height: 32)
                 }
             }
         }
-
     }
+    
+}
+
+
+struct CoverImage: View {
+    var body: some View {
+        ZStack {
+            Image("Shawshankscoverimage")
+                .resizable()
+                .scaledToFill()
+                .padding(.top, -80)
+            
+            
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black.opacity(0.9),
+                    Color.black.opacity(0)
+                ]),
+                startPoint: .bottom,
+                endPoint: .top
+            )
+        }
+    }
+}
 
 
 struct MoivesOverview: View {
@@ -50,7 +58,7 @@ struct MoivesOverview: View {
         
         LazyVGrid(columns: [
             GridItem(.fixed(119),spacing: 70),
-            GridItem(.fixed(100),spacing: 70)
+            GridItem(.fixed(119),spacing: 70)
         ],alignment: .leading,  spacing: 32){
             
             VStack(alignment: .leading, spacing: 8){
