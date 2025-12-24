@@ -15,8 +15,7 @@ struct SigninPage: View {
             .frame(width: 400, height: 694)
             .ignoresSafeArea()
             Spacer()
-        ///dfdfdfdfdfd
-    
+
 
       
     }
