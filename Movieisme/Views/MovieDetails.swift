@@ -23,6 +23,10 @@ struct MovieDetails: View {
                     MoivesOverview()
              
                     Spacer().frame(height: 32)
+                    
+                    StorySection()
+                    
+                    Spacer().frame(height: 32)
                 }
             }
         }
@@ -100,6 +104,20 @@ struct MoivesOverview: View {
                     .foregroundColor(Color("greyish"))
                 
             }
+        }
+    }
+}
+
+struct StorySection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Story")
+                .font(.system(size: 18, weight: .semibold))
+            
+            Text("Synopsis. In 1947, Andy Dufresne (Tim Robbins), a banker in Maine, is convicted of murdering his wife and her lover, a golf pro. Since the state of Maine has no death penalty, he is given two consecutive life sentences and sent to the notoriously harsh Shawshank Prison.")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("greyish"))
+   
         }
     }
 }
