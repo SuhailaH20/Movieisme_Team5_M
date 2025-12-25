@@ -11,30 +11,25 @@ struct MovieDetails: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                
                 CoverImage()
+                
                 VStack(alignment: .leading) {
-                    
                     Text("Shawshank")
-                      .font(.system(size: 28, weight: .bold))
-       
+                        .font(.system(size: 28, weight: .bold))
+                    
                     Spacer().frame(height: 40)
                     
                     MoivesOverview()
-             
                     Spacer().frame(height: 32)
                     
                     StorySection()
-                    
                     Spacer().frame(height: 32)
                     
                     RatingSection()
                     
                     Divider()
                         .background(Color.gray)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                        .padding(.bottom, 8)
+                        .padding(.vertical, 8)
                     
                     DirectorSection()
                     Spacer().frame(height: 16)
@@ -44,8 +39,8 @@ struct MovieDetails: View {
             }
         }
     }
-    
 }
+
 
 
 struct CoverImage: View {
@@ -54,7 +49,7 @@ struct CoverImage: View {
             Image("Shawshankscoverimage")
                 .resizable()
                 .scaledToFill()
-                .padding(.top, -80)
+                .padding(.top, -100)
             
             
             LinearGradient(
@@ -212,6 +207,25 @@ struct StarSection: View {
                 }
 
             }
+        }
+    }
+}
+
+struct RatingandReview: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Rating  & Reviews ")
+                .font(.system(size: 18, weight: .semibold))
+            
+            Text("4.8")
+                .font(.system(size: 39, weight: .medium))
+                .foregroundColor(Color("greyish"))
+            
+            Text("out of 5")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("greyish"))
+            
+            Spacer().frame(height: 32)
         }
     }
 }
