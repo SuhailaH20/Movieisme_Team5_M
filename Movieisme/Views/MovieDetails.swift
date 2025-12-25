@@ -11,9 +11,9 @@ struct MovieDetails: View {
     var body: some View {
         NavigationStack {
             ScrollView {
+                
+                CoverImage()
                 VStack(alignment: .leading) {
-                    
-                    CoverImage()
                     
                     Text("Shawshank")
                       .font(.system(size: 28, weight: .bold))
@@ -35,7 +35,12 @@ struct MovieDetails: View {
                         .padding(.horizontal)
                         .padding(.top, 8)
                         .padding(.bottom, 8)
-                }
+                    
+                    DirectorSection()
+                    Spacer().frame(height: 16)
+                    
+                    StarSection()
+                }.padding(.horizontal)
             }
         }
     }
@@ -54,7 +59,7 @@ struct CoverImage: View {
             
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color.black.opacity(0.9),
+                    Color.black.opacity(0.999),
                     Color.black.opacity(0)
                 ]),
                 startPoint: .bottom,
@@ -144,6 +149,48 @@ struct RatingSection: View {
     }
 }
 
+struct DirectorSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Director")
+                .font(.system(size: 18, weight: .semibold))
+            
+            Image("FrankDarabont")
+                .resizable()
+                .scaledToFill()
+                .frame(width: 76, height: 76)
+                .clipShape(Circle())
+            
+            Text("Frank Darabont")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("greyish"))
+        }
+    }
+}
+
+struct StarSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Stars")
+                .font(.system(size: 18, weight: .semibold))
+            
+            HStack{
+                VStack{
+                    Image("LeonardoDiCaprio")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Leonardo DiCaprio")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+
+            }
+        }
+    }
+}
 #Preview {
     MovieDetails()
 }

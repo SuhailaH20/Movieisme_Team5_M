@@ -14,6 +14,14 @@ struct ProfileView: View {
         GridItem(.flexible(), spacing: 14)
     ]
 
+
+    @State private var user = ProfileUser(
+        firstName: "Sarah",
+        lastName: "Abdullah",
+        email: "xxxx234@gmail.com",
+        imageName: "ProfileImg"
+    )
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -22,15 +30,21 @@ struct ProfileView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 20) {
 
-                        // Title
                         Text("Profile")
                             .font(.system(size: 37, weight: .bold))
                             .foregroundStyle(.white)
 
-                        // User Card
-                        userInfoCard
+                        NavigationLink {
+                            ProfileInfoView(user: $user)
+                        } label: {
+                            UserInfoCardView(
+                                fullName: user.fullName,
+                                email: user.email,
+                                imageName: user.imageName
+                            )
+                        }
+                        .buttonStyle(.plain)
 
-                        // Saved Movies
                         Text("Saved movies")
                             .font(.system(size: 27, weight: .semibold))
                             .foregroundStyle(.white)
@@ -48,7 +62,7 @@ struct ProfileView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        // dismiss()
+
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
@@ -62,6 +76,7 @@ struct ProfileView: View {
         }
     }
 }
+
 #Preview {
     ProfileView()
         .preferredColorScheme(.dark)
