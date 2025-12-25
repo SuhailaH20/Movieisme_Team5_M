@@ -37,6 +37,9 @@ struct MovieDetails: View {
                         .padding(.bottom, 8)
                     
                     DirectorSection()
+                    Spacer().frame(height: 16)
+                    
+                    StarSection()
                 }.padding(.horizontal)
             }
         }
@@ -165,6 +168,29 @@ struct DirectorSection: View {
     }
 }
 
+struct StarSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Stars")
+                .font(.system(size: 18, weight: .semibold))
+            
+            HStack{
+                VStack{
+                    Image("LeonardoDiCaprio")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Leonardo DiCaprio")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+
+            }
+        }
+    }
+}
 #Preview {
     MovieDetails()
 }
