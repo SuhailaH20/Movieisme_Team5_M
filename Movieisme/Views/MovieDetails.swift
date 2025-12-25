@@ -174,15 +174,39 @@ struct StarSection: View {
             Text("Stars")
                 .font(.system(size: 18, weight: .semibold))
             
-            HStack{
+            HStack(spacing: 24){
                 VStack{
-                    Image("LeonardoDiCaprio")
+                    Image("TimRobbins")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 76, height: 76)
                         .clipShape(Circle())
                     
-                    Text("Leonardo DiCaprio")
+                    Text("Tim Robbins")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+                
+                VStack{
+                    Image("BobGunton")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Bob Gunton")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+                
+                VStack{
+                    Image("MorganFreeman")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Morgan Freeman")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(Color("greyish"))
                 }
