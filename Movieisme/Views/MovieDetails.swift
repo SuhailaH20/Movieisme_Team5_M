@@ -8,40 +8,61 @@
 import SwiftUI
 
 struct MovieDetails: View {
+    @StateObject var viewModel = MovieDetailsViewModel()
+    let movieID: String
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                CoverImage()
-                
-                VStack(alignment: .leading) {
-                    Text("Shawshank")
-                        .font(.system(size: 28, weight: .bold))
-                    
-                    Spacer().frame(height: 40)
-                    
-                    MoivesOverview()
-                    Spacer().frame(height: 32)
-                    
-                    StorySection()
-                    Spacer().frame(height: 32)
-                    
-                    RatingSection()
-                    
-                    Divider()
-                        .background(Color.gray)
-                        .padding(.vertical, 8)
-                    
-                    DirectorSection()
-                    Spacer().frame(height: 16)
-                    
-                    StarSection()
-                    
-                    Divider()
-                        .background(Color.gray)
-                        .padding(.vertical, 8)
-                    
-                    RatingandReview()
-                }.padding(.horizontal)
+            Group {
+                if viewModel.isLoading {
+                    ProgressView("Loading...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let movie = viewModel.movie {
+                    ScrollView {
+                        CoverImage(urlString: movie.poster)
+
+                        VStack(alignment: .leading) {
+                            Text(movie.name)
+                                .font(.system(size: 28, weight: .bold))
+                            Spacer().frame(height: 20)
+
+                            MovieOverview(movie: movie)
+                            Spacer().frame(height: 32)
+
+                            StorySection(movie: movie)
+                            Spacer().frame(height: 32)
+
+                            RatingSection(rating: movie.IMDb_rating)
+                            
+                            Divider()
+                                .background(Color.gray)
+                                .padding(.vertical, 8)
+                            
+                            DirectorSection()
+                            Spacer().frame(height: 16)
+                            
+                            StarSection()
+                            
+                            Divider()
+                                .background(Color.gray)
+                                .padding(.vertical, 8)
+                            
+                            RatingandReview()
+                        }
+                        .padding(.horizontal)
+                    }
+                } else if let error = viewModel.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                } else {
+                    Text("No data")
+                        .foregroundColor(.gray)
+                }
+            }
+            .task {
+                await viewModel.loadMovie(id: movieID)
             }
         }
     }
@@ -50,28 +71,35 @@ struct MovieDetails: View {
 
 
 struct CoverImage: View {
+    let urlString: String
+
     var body: some View {
-        ZStack {
-            Image("Shawshankscoverimage")
-                .resizable()
-                .scaledToFill()
-                .padding(.top, -100)
-            
-            
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.black.opacity(0.999),
-                    Color.black.opacity(0)
-                ]),
-                startPoint: .bottom,
-                endPoint: .top
-            )
+        AsyncImage(url: URL(string: urlString)) { phase in
+            if let image = phase.image {
+                ZStack{
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .padding(.top, -100)
+                
+                
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.black.opacity(0.999),
+                        Color.black.opacity(0)
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            } .frame(maxHeight: 300)
+            }
         }
     }
 }
 
-
-struct MoivesOverview: View {
+struct MovieOverview: View {
+    let movie: Movie
+    
     var body: some View {
         
         LazyVGrid(columns: [
@@ -83,17 +111,16 @@ struct MoivesOverview: View {
                 Text("Duration")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("2 hours 22 mins")
+                Text("\(movie.runtime)")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
             }
-            
             
             VStack(alignment: .leading, spacing: 8){
                 Text("Language")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("English")
+                Text("\(movie.language.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
                 
@@ -103,32 +130,32 @@ struct MoivesOverview: View {
                 Text("Genre")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("Drama")
+                Text("\(movie.genre.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
                 
             }
             
-            VStack(alignment: .leading, spacing: 8){
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Age")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("+15")
+                Text("\(movie.rating)")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color("greyish"))
-                
+                .foregroundColor(Color("greyish"))
             }
         }
     }
 }
 
 struct StorySection: View {
+    let movie: Movie
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("Story")
                 .font(.system(size: 18, weight: .semibold))
-            
-            Text("Synopsis. In 1947, Andy Dufresne (Tim Robbins), a banker in Maine, is convicted of murdering his wife and her lover, a golf pro. Since the state of Maine has no death penalty, he is given two consecutive life sentences and sent to the notoriously harsh Shawshank Prison.")
+            Text(movie.story)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
    
@@ -137,13 +164,15 @@ struct StorySection: View {
 }
 
 struct RatingSection: View {
+    let rating: Double
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("IMDb Rating")
                 .font(.system(size: 18, weight: .semibold))
-    
-            Text("9.3 / 10")
-                .font(.system(size: 15, weight: .medium))
+            
+            Text(String(format: "%.1f / 10", rating))
+                .font(.system(size: 15))
                 .foregroundColor(Color("greyish"))
     
         }
@@ -298,5 +327,5 @@ struct ReviewCard: View {
 
 
 #Preview {
-    MovieDetails()
+    MovieDetails(movieID: "recfNj1e4waOUJLxd")
 }
