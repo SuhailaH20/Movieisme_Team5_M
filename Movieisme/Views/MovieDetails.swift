@@ -35,6 +35,12 @@ struct MovieDetails: View {
                     Spacer().frame(height: 16)
                     
                     StarSection()
+                    
+                    Divider()
+                        .background(Color.gray)
+                        .padding(.vertical, 8)
+                    
+                    RatingandReview()
                 }.padding(.horizontal)
             }
         }
@@ -226,9 +232,71 @@ struct RatingandReview: View {
                 .foregroundColor(Color("greyish"))
             
             Spacer().frame(height: 32)
+            
+            ReviewCard(
+                author: "Afnan Abdullah",
+                review: "This is an engagingly simple, good-hearted film, with just enough darkness around the edges to give contrast and relief to its glowingly benign view of human nature.",
+                rating: 4,
+                date: "2 days ago"
+            )
+            
         }
     }
 }
+
+struct ReviewCard: View {
+    let author: String
+    let review: String
+    let rating: Int
+    let date: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+
+            
+            HStack(alignment: .top) {
+                Circle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 36, height: 36)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(author)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                   
+                    HStack(spacing: 2) {
+                        ForEach(0..<5) { index in
+                            Image(systemName: index < rating ? "star.fill" : "star")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                        }
+                    }
+                }
+
+            }
+
+           
+            Text(review)
+                .font(.footnote)
+                .foregroundColor(Color.white)
+            
+            HStack{
+                Spacer()
+                
+                
+                Text(date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.09))
+        .cornerRadius(8)
+    }
+}
+
+
 #Preview {
     MovieDetails()
 }
