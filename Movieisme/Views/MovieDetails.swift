@@ -38,7 +38,10 @@ struct MovieDetails: View {
                                 .background(Color.gray)
                                 .padding(.vertical, 8)
                             
-                            DirectorSection()
+                            if let director = viewModel.director {
+                                DirectorSection(director: director)
+                            }
+
                             Spacer().frame(height: 16)
                             
                             StarSection()
@@ -180,18 +183,22 @@ struct RatingSection: View {
 }
 
 struct DirectorSection: View {
+    let director: Director
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("Director")
                 .font(.system(size: 18, weight: .semibold))
-            
-            Image("FrankDarabont")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 76, height: 76)
-                .clipShape(Circle())
-            
-            Text("Frank Darabont")
+
+            AsyncImage(url: URL(string: director.image)) { image in
+                image.resizable().scaledToFill()
+            } placeholder: {
+                ProgressView()
+            }
+            .frame(width: 76, height: 76)
+            .clipShape(Circle())
+
+            Text(director.name)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
         }
