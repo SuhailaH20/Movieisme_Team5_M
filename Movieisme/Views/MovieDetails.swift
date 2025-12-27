@@ -327,5 +327,5 @@ struct ReviewCard: View {
 
 
 #Preview {
-    MovieDetails(movieID: "recfNj1e4waOUJLxd")
+    MovieDetails(movieID: "reckJmZ458CZcLlUd")
 }
