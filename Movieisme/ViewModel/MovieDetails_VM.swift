@@ -23,7 +23,7 @@ class MovieDetailsViewModel: ObservableObject {
             errorMessage = "Invalid URL"
             return
         }
-
+        print("API KEY:", APIKey.airtable)
         var request = URLRequest(url: url)
         request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
 
