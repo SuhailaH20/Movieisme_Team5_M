@@ -67,6 +67,22 @@ struct MovieDetails: View {
                         .foregroundColor(.gray)
                 }
             }
+            .toolbar {
+                
+               ToolbarItem(placement: .navigationBarLeading) {
+                    Image(systemName: "chevron.left")
+                       .foregroundStyle(Color(.yellow))
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(Color(.yellow))
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Image(systemName: "bookmark")
+                        .foregroundStyle(Color(.yellow))
+                }
+            }
+           
             .task {
                 await viewModel.loadMovie(id: movieID)
             }
