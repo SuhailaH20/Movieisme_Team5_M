@@ -14,7 +14,7 @@ extension ProfileView {
             RoundedRectangle(cornerRadius: 7)
                 .fill(Color.white.opacity(0.08))
 
-            Image(imageName) // صورة من Assets
+            Image(imageName) 
                 .resizable()
                 .scaledToFill()
         }

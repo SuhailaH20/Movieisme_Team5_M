@@ -25,7 +25,6 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 20) {
@@ -74,6 +73,40 @@ struct ProfileView: View {
                 }
             }
         }
+    }
+}
+
+struct UserInfoCardView: View {
+    let fullName: String
+    let email: String
+    let imageName: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ProfileAvatarView(imageName: imageName, size: 64)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(fullName)
+                    .foregroundStyle(.white)
+                    .font(.system(size: 18, weight: .semibold))
+
+                Text(email)
+                    .foregroundStyle(.white.opacity(0.75))
+                    .font(.system(size: 14, weight: .regular))
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.white.opacity(0.6))
+                .font(.system(size: 14, weight: .semibold))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(.secondarySystemBackground))
+        )
     }
 }
 
