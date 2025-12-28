@@ -8,69 +8,98 @@
 import SwiftUI
 
 struct MovieDetails: View {
+    @StateObject var viewModel = MovieDetailsViewModel()
+    let movieID: String
+
     var body: some View {
         NavigationStack {
-            ScrollView {
-                
-                CoverImage()
-                VStack(alignment: .leading) {
-                    
-                    Text("Shawshank")
-                      .font(.system(size: 28, weight: .bold))
-       
-                    Spacer().frame(height: 40)
-                    
-                    MoivesOverview()
-             
-                    Spacer().frame(height: 32)
-                    
-                    StorySection()
-                    
-                    Spacer().frame(height: 32)
-                    
-                    RatingSection()
-                    
-                    Divider()
-                        .background(Color.gray)
+            Group {
+                if viewModel.isLoading {
+                    ProgressView("Loading...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let movie = viewModel.movie {
+                    ScrollView {
+                        CoverImage(urlString: movie.poster)
+
+                        VStack(alignment: .leading) {
+                            Text(movie.name)
+                                .font(.system(size: 28, weight: .bold))
+                            Spacer().frame(height: 20)
+
+                            MovieOverview(movie: movie)
+                            Spacer().frame(height: 32)
+
+                            StorySection(movie: movie)
+                            Spacer().frame(height: 32)
+
+                            RatingSection(rating: movie.IMDb_rating)
+                            
+                            Divider()
+                                .background(Color.gray)
+                                .padding(.vertical, 8)
+                            
+                            DirectorSection()
+                            Spacer().frame(height: 16)
+                            
+                            StarSection()
+                            
+                            Divider()
+                                .background(Color.gray)
+                                .padding(.vertical, 8)
+                            
+                            RatingandReview()
+                        }
                         .padding(.horizontal)
-                        .padding(.top, 8)
-                        .padding(.bottom, 8)
-                    
-                    DirectorSection()
-                    Spacer().frame(height: 16)
-                    
-                    StarSection()
-                }.padding(.horizontal)
+                    }
+                } else if let error = viewModel.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                } else {
+                    Text("No data")
+                        .foregroundColor(.gray)
+                }
+            }
+            .task {
+                await viewModel.loadMovie(id: movieID)
             }
         }
     }
-    
 }
 
 
+
 struct CoverImage: View {
+    let urlString: String
+
     var body: some View {
-        ZStack {
-            Image("Shawshankscoverimage")
-                .resizable()
-                .scaledToFill()
-                .padding(.top, -80)
-            
-            
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.black.opacity(0.999),
-                    Color.black.opacity(0)
-                ]),
-                startPoint: .bottom,
-                endPoint: .top
-            )
+        AsyncImage(url: URL(string: urlString)) { phase in
+            if let image = phase.image {
+                ZStack{
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .padding(.top, -100)
+                
+                
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.black.opacity(0.999),
+                        Color.black.opacity(0)
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            } .frame(maxHeight: 300)
+            }
         }
     }
 }
 
-
-struct MoivesOverview: View {
+struct MovieOverview: View {
+    let movie: Movie
+    
     var body: some View {
         
         LazyVGrid(columns: [
@@ -82,17 +111,16 @@ struct MoivesOverview: View {
                 Text("Duration")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("2 hours 22 mins")
+                Text("\(movie.runtime)")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
             }
-            
             
             VStack(alignment: .leading, spacing: 8){
                 Text("Language")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("English")
+                Text("\(movie.language.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
                 
@@ -102,32 +130,32 @@ struct MoivesOverview: View {
                 Text("Genre")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("Drama")
+                Text("\(movie.genre.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
                 
             }
             
-            VStack(alignment: .leading, spacing: 8){
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Age")
                     .font(.system(size: 18, weight: .semibold))
                 
-                Text("+15")
+                Text("\(movie.rating)")
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color("greyish"))
-                
+                .foregroundColor(Color("greyish"))
             }
         }
     }
 }
 
 struct StorySection: View {
+    let movie: Movie
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("Story")
                 .font(.system(size: 18, weight: .semibold))
-            
-            Text("Synopsis. In 1947, Andy Dufresne (Tim Robbins), a banker in Maine, is convicted of murdering his wife and her lover, a golf pro. Since the state of Maine has no death penalty, he is given two consecutive life sentences and sent to the notoriously harsh Shawshank Prison.")
+            Text(movie.story)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
    
@@ -136,13 +164,15 @@ struct StorySection: View {
 }
 
 struct RatingSection: View {
+    let rating: Double
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("IMDb Rating")
                 .font(.system(size: 18, weight: .semibold))
-    
-            Text("9.3 / 10")
-                .font(.system(size: 15, weight: .medium))
+            
+            Text(String(format: "%.1f / 10", rating))
+                .font(.system(size: 15))
                 .foregroundColor(Color("greyish"))
     
         }
@@ -174,15 +204,39 @@ struct StarSection: View {
             Text("Stars")
                 .font(.system(size: 18, weight: .semibold))
             
-            HStack{
+            HStack(spacing: 24){
                 VStack{
-                    Image("LeonardoDiCaprio")
+                    Image("TimRobbins")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 76, height: 76)
                         .clipShape(Circle())
                     
-                    Text("Leonardo DiCaprio")
+                    Text("Tim Robbins")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+                
+                VStack{
+                    Image("BobGunton")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Bob Gunton")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("greyish"))
+                }
+                
+                VStack{
+                    Image("MorganFreeman")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    
+                    Text("Morgan Freeman")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(Color("greyish"))
                 }
@@ -191,6 +245,87 @@ struct StarSection: View {
         }
     }
 }
+
+struct RatingandReview: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8){
+            Text("Rating  & Reviews ")
+                .font(.system(size: 18, weight: .semibold))
+            
+            Text("4.8")
+                .font(.system(size: 39, weight: .medium))
+                .foregroundColor(Color("greyish"))
+            
+            Text("out of 5")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("greyish"))
+            
+            Spacer().frame(height: 32)
+            
+            ReviewCard(
+                author: "Afnan Abdullah",
+                review: "This is an engagingly simple, good-hearted film, with just enough darkness around the edges to give contrast and relief to its glowingly benign view of human nature.",
+                rating: 4,
+                date: "2 days ago"
+            )
+            
+        }
+    }
+}
+
+struct ReviewCard: View {
+    let author: String
+    let review: String
+    let rating: Int
+    let date: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+
+            
+            HStack(alignment: .top) {
+                Circle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 36, height: 36)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(author)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                   
+                    HStack(spacing: 2) {
+                        ForEach(0..<5) { index in
+                            Image(systemName: index < rating ? "star.fill" : "star")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                        }
+                    }
+                }
+
+            }
+
+           
+            Text(review)
+                .font(.footnote)
+                .foregroundColor(Color.white)
+            
+            HStack{
+                Spacer()
+                
+                
+                Text(date)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.09))
+        .cornerRadius(8)
+    }
+}
+
+
 #Preview {
-    MovieDetails()
+    MovieDetails(movieID: "reckJmZ458CZcLlUd")
 }
