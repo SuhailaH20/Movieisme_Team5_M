@@ -38,10 +38,16 @@ struct MovieDetails: View {
                                 .background(Color.gray)
                                 .padding(.vertical, 8)
                             
-                            DirectorSection()
+                            if let director = viewModel.director {
+                                DirectorSection(director: director)
+                            }
+
                             Spacer().frame(height: 16)
                             
-                            StarSection()
+                            if !viewModel.actors.isEmpty {
+                                StarSection(actors: viewModel.actors)
+                            }
+
                             
                             Divider()
                                 .background(Color.gray)
@@ -180,18 +186,22 @@ struct RatingSection: View {
 }
 
 struct DirectorSection: View {
+    let director: Director
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("Director")
                 .font(.system(size: 18, weight: .semibold))
-            
-            Image("FrankDarabont")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 76, height: 76)
-                .clipShape(Circle())
-            
-            Text("Frank Darabont")
+
+            AsyncImage(url: URL(string: director.image)) { image in
+                image.resizable().scaledToFill()
+            } placeholder: {
+                ProgressView()
+            }
+            .frame(width: 76, height: 76)
+            .clipShape(Circle())
+
+            Text(director.name)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
         }
@@ -199,46 +209,30 @@ struct DirectorSection: View {
 }
 
 struct StarSection: View {
+    let actors: [Actor]
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8){
             Text("Stars")
                 .font(.system(size: 18, weight: .semibold))
-            
-            HStack(spacing: 24){
-                VStack{
-                    Image("TimRobbins")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 76, height: 76)
-                        .clipShape(Circle())
-                    
-                    Text("Tim Robbins")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color("greyish"))
-                }
-                
-                VStack{
-                    Image("BobGunton")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 76, height: 76)
-                        .clipShape(Circle())
-                    
-                    Text("Bob Gunton")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color("greyish"))
-                }
-                
-                VStack{
-                    Image("MorganFreeman")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 76, height: 76)
-                        .clipShape(Circle())
-                    
-                    Text("Morgan Freeman")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color("greyish"))
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 24) {
+                    ForEach(actors) { actor in
+                        VStack {
+                            AsyncImage(url: URL(string: actor.image)) { image in
+                                image.resizable().scaledToFill()
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            .frame(width: 76, height: 76)
+                            .clipShape(Circle())
+
+                            Text(actor.name)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(Color("greyish"))
+                        }
+                    }
                 }
 
             }
