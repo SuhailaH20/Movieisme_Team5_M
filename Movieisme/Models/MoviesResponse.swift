@@ -23,8 +23,17 @@ struct Movie: Codable {
     let rating: String
     let IMDb_rating: Double
     let language: [String]
+}
 
+struct Director: Codable {
+    let name: String
+    let image: String
+}
 
+struct Actor: Codable, Identifiable {
+    var id = UUID()
+    let name: String
+    let image: String
 }
 
 enum APIKey {
