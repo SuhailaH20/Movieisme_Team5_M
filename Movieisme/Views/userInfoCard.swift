@@ -7,40 +7,42 @@
 
 import SwiftUI
 
-var userInfoCard: some View {
-    HStack(spacing: 16) {
-        
-        
-        Image("ProfileImg")
-            .resizable()
-            .scaledToFill()
-            .frame(width: 70, height: 70)
-            .clipShape(Circle())
+struct UserInfoCardView: View {
+    let fullName: String
+    let email: String
+    let imageName: String
 
-        VStack(alignment: .leading, spacing: 6) {
+    var body: some View {
+        HStack(spacing: 16) {
 
-            
-            Text("Sarah Abdullah")
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(.white)
+            Image(imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 70, height: 70)
+                .clipShape(Circle())
 
+            VStack(alignment: .leading, spacing: 6) {
+                Text(fullName)
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(.white)
 
-            Text("xxxx234@gmail.com")
-                .font(.system(size: 15, weight: .regular))
-                .foregroundStyle(.white)
+                Text(email)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.white.opacity(0.6))
         }
-
-        Spacer()
-
-        Image(systemName: "chevron.right")
-            .foregroundStyle(.white.opacity(0.6))
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.secondarySystemBackground))
+        )
     }
-    .padding(16)
-    .background(
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color(.secondarySystemBackground)))
 }
-
 
 #Preview {
     ProfileView()
