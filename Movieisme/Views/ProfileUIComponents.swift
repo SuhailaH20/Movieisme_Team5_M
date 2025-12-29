@@ -4,8 +4,8 @@
 //
 //  Created by شهد عبدالله القحطاني on 08/07/1447 AH.
 //
-import SwiftUI
 
+import SwiftUI
 
 struct ProfileScreen<Content: View, Trailing: View>: View {
     let title: String
@@ -24,6 +24,7 @@ struct ProfileScreen<Content: View, Trailing: View>: View {
 
     var body: some View {
         ZStack {
+            Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Divider().profileDivider()
@@ -45,7 +46,6 @@ struct ProfileScreen<Content: View, Trailing: View>: View {
     }
 }
 
-
 struct ProfileScreenNoTrailing<Content: View>: View {
     let title: String
     @ViewBuilder var content: Content
@@ -57,7 +57,8 @@ struct ProfileScreenNoTrailing<Content: View>: View {
 
     var body: some View {
         ZStack {
-            
+            Color.black.ignoresSafeArea()
+
             VStack(spacing: 0) {
                 Divider().profileDivider()
 
@@ -74,8 +75,6 @@ struct ProfileScreenNoTrailing<Content: View>: View {
         }
     }
 }
-
-
 
 struct ProfileInfoCard<Content: View>: View {
     @ViewBuilder var content: Content
@@ -96,36 +95,51 @@ struct ProfileInfoCard<Content: View>: View {
     }
 }
 
-
 struct ProfileInfoRow: View {
     let title: String
     let value: String
 
     var body: some View {
-        HStack {
-            Text(title).profileRowTitle()
-            Spacer()
-            Text(value).profileRowValue()
+        ZStack {
+            
+            HStack {
+                Text(title)
+                    .profileRowTitle()
+                Spacer()
+            }
+
+    
+            Text(value)
+                .profileRowValue()
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
     }
 }
 
+
 struct ProfileTextFieldRow: View {
     let title: String
     @Binding var text: String
 
     var body: some View {
-        HStack {
-            Text(title).profileRowTitle()
-            Spacer()
+        ZStack {
+            // العنوان يسار
+            HStack {
+                Text(title).profileRowTitle()
+                Spacer()
+            }
+
+            // التكست فيلد بالوسط
             TextField("", text: $text)
-                .multilineTextAlignment(.trailing)
+                .multilineTextAlignment(.center)
                 .foregroundStyle(.white)
                 .font(.system(size: 15, weight: .semibold))
                 .textInputAutocapitalization(.words)
-                .disableAutocorrection(true)
+                .autocorrectionDisabled(true)
+                .keyboardType(.default)
+                .frame(maxWidth: 200) // تقدرين تكبرينها إذا تبين
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
@@ -163,7 +177,7 @@ struct ProfileAvatarView: View {
     }
 }
 
-// - Sign Out
+// Sign Out
 struct ProfileDangerButton: View {
     let title: String
     var action: () -> Void
@@ -185,10 +199,10 @@ struct ProfileDangerButton: View {
     }
 }
 
-
 extension View {
     func profileDivider() -> some View {
-        self.background(Color.black.opacity(0.15))
+        self
+            .overlay(Color.black.opacity(0.15))
     }
 }
 
