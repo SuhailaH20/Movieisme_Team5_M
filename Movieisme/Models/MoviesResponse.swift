@@ -13,7 +13,6 @@ struct MovieRecord: Codable, Identifiable {
     let fields: Movie
 }
 
-// MARK: - Movie Model
 struct Movie: Codable {
     let name: String
     let poster: String
@@ -35,6 +34,39 @@ struct Actor: Codable, Identifiable {
     let name: String
     let image: String
 }
+
+struct ReviewRecord: Codable, Identifiable {
+    let id: String
+    let fields: Review
+}
+
+struct Review: Codable {
+    let rate: Int
+    let review_text: String
+    let movie_id: String
+    let user_id: String
+}
+
+
+struct UserRecord: Codable {
+    let id: String
+    let fields: User
+}
+
+
+struct User: Codable {
+    let name: String
+    let profile_image: String
+}
+
+struct MovieReview: Identifiable {
+    let id: String
+    let author: String
+    let authorImage: String
+    let text: String
+    let rating: Int
+}
+
 
 enum APIKey {
     static let airtable = Bundle.main

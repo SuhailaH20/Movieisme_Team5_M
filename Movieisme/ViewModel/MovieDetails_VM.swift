@@ -13,6 +13,7 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var movie: Movie?
     @Published var director: Director?
     @Published var actors: [Actor] = []
+    @Published var reviews: [MovieReview] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -31,6 +32,8 @@ class MovieDetailsViewModel: ObservableObject {
 
             // Load actors
             await loadActors(movieID: id)
+            
+            await loadReviews(movieID: id)
 
         } catch {
             errorMessage = error.localizedDescription
@@ -106,6 +109,46 @@ class MovieDetailsViewModel: ObservableObject {
 
         } catch {
             print("Actors error:", error)
+        }
+    }
+
+    private func loadReviews(movieID: String) async {
+        do {
+            let urlString =
+            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/reviews?filterByFormula=movie_id=\"\(movieID)\""
+
+            let data = try await fetch(URL(string: urlString)!)
+
+            struct ReviewResponse: Codable {
+                let records: [ReviewRecord]
+            }
+
+            let decoded = try JSONDecoder().decode(ReviewResponse.self, from: data)
+
+            var tempReviews: [MovieReview] = []
+
+            for record in decoded.records {
+                let userURL =
+                URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/\(record.fields.user_id)")!
+
+                let userData = try await fetch(userURL)
+                let userRecord = try JSONDecoder().decode(UserRecord.self, from: userData)
+
+                let review = MovieReview(
+                    id: record.id,
+                    author: userRecord.fields.name,
+                    authorImage: userRecord.fields.profile_image,
+                    text: record.fields.review_text,
+                    rating: record.fields.rate
+                )
+
+                tempReviews.append(review)
+            }
+
+            reviews = tempReviews
+
+        } catch {
+            print("Reviews error:", error)
         }
     }
 
