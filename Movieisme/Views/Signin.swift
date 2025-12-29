@@ -87,6 +87,8 @@ struct StyledInputField: View {
     @Binding var text: String
     let isSecure: Bool
 
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)
@@ -98,14 +100,23 @@ struct StyledInputField: View {
                 Group {
                     if isSecure {
                         SecureField(placeholder, text: $text)
+                            .focused($isFocused)
                     } else {
                         TextField(placeholder, text: $text)
+                            .focused($isFocused)
                     }
                 }
                 .padding()
-                .background(Color.gray.opacity(0.26))
                 .frame(width: 358, height: 44)
+                .background(Color.gray.opacity(0.26))
                 .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(
+                            isFocused ? Color.yellow : Color.clear,
+                            lineWidth: 2
+                        )
+                )
                 .foregroundColor(.white)
                 .accentColor(.yellow)
 
