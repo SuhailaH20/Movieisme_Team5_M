@@ -36,6 +36,9 @@ struct BackgroundImage: View {
 
 
 struct InputField: View {
+    @State private var email = ""
+    @State private var password = ""
+
     var body: some View {
         VStack(alignment: .leading) {
             Spacer()
@@ -55,19 +58,24 @@ struct InputField: View {
                 StyledInputField(
                     title: "Email",
                     placeholder: "test@email.com",
+                    text: $email,
                     isSecure: false
                 )
 
                 StyledInputField(
                     title: "Password",
                     placeholder: "123456",
+                    text: $password,
                     isSecure: true
                 )
                 
                 
             }
             Spacer().frame(height: 41)
-            SigninButton()
+
+            SigninButton(
+                isEnabled: !email.isEmpty && !password.isEmpty
+            )
         }
     }
 }
@@ -76,6 +84,7 @@ struct InputField: View {
 struct StyledInputField: View {
     let title: String
     let placeholder: String
+    @Binding var text: String
     let isSecure: Bool
 
     var body: some View {
@@ -88,9 +97,9 @@ struct StyledInputField: View {
             ZStack(alignment: .trailing) {
                 Group {
                     if isSecure {
-                        SecureField("", text: .constant(placeholder))
+                        SecureField(placeholder, text: $text)
                     } else {
-                        TextField("", text: .constant(placeholder))
+                        TextField(placeholder, text: $text)
                     }
                 }
                 .padding()
@@ -112,18 +121,22 @@ struct StyledInputField: View {
 
 
 struct SigninButton: View {
+    let isEnabled: Bool
+
     var body: some View {
-        Button(action: {}) {
+        Button(action: {
+            print("Signed in")
+        }) {
             Text("Sign in")
                 .font(.headline)
-                .foregroundColor(.black)
+                .foregroundColor(isEnabled ? .black : .white)
                 .frame(width: 358, height: 44)
-                .background(Color.yellow)
+                .background(isEnabled ? Color.yellow : Color.gray)
                 .cornerRadius(8)
         }
-        }
+        .disabled(!isEnabled)
     }
-
+}
 
 #Preview {
     SigninPage()
