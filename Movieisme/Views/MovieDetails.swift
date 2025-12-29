@@ -53,7 +53,8 @@ struct MovieDetails: View {
                                 .background(Color.gray)
                                 .padding(.vertical, 8)
                             
-                            RatingandReview()
+                            RatingandReview(viewModel: viewModel)
+
                         }
                         .padding(.horizontal)
                     }
@@ -257,11 +258,14 @@ struct StarSection: View {
 }
 
 struct RatingandReview: View {
+    @ObservedObject var viewModel: MovieDetailsViewModel
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
-            Text("Rating  & Reviews ")
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Rating & Reviews")
                 .font(.system(size: 18, weight: .semibold))
             
+            //how can i make this dynamic????
             Text("4.8")
                 .font(.system(size: 39, weight: .medium))
                 .foregroundColor(Color("greyish"))
@@ -270,57 +274,64 @@ struct RatingandReview: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
             
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 20)
             
-            ReviewCard(
-                author: "Afnan Abdullah",
-                review: "This is an engagingly simple, good-hearted film, with just enough darkness around the edges to give contrast and relief to its glowingly benign view of human nature.",
-                rating: 4,
-                date: "2 days ago"
-            )
-            
+            if viewModel.reviews.isEmpty {
+                Text("No reviews yet")
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(viewModel.reviews) { review in
+                    ReviewCard(review: review)
+                }
+            }
         }
     }
 }
 
+
 struct ReviewCard: View {
-    let author: String
-    let review: String
-    let rating: Int
-    let date: String
+    let review: MovieReview
+    //not dynamic yet i need to build a func to map or translate the data into something similr to this format
+    let date: String = "2 days ago"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
 
-            
-            HStack(alignment: .top) {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 36, height: 36)
+            HStack(alignment: .top, spacing: 12) {
+                AsyncImage(url: URL(string: review.authorImage)) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    Color.gray.opacity(0.3)
+                }
+                .frame(width: 36, height: 36)
+                .clipShape(Circle())
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(author)
+                    Text(review.author)
                         .font(.subheadline)
                         .fontWeight(.semibold)
 
                    
                     HStack(spacing: 2) {
                         ForEach(0..<5) { index in
-                            Image(systemName: index < rating ? "star.fill" : "star")
+                            Image(systemName: index < review.rating ? "star.fill" : "star")
                                 .font(.caption)
                                 .foregroundColor(.yellow)
                         }
                     }
                 }
 
+                Spacer()
             }
 
-           
-            Text(review)
+            Text(review.text)
                 .font(.footnote)
-                .foregroundColor(Color.white)
-            
-            HStack{
+                .foregroundColor(.white)
+                .lineLimit(4)
+
+            Spacer()
+
+            HStack {
                 Spacer()
                 
                 
@@ -329,6 +340,7 @@ struct ReviewCard: View {
                     .foregroundColor(.secondary)
             }
         }
+        .frame(width: 350, height: 180)
         .padding()
         .background(Color.white.opacity(0.09))
         .cornerRadius(8)
