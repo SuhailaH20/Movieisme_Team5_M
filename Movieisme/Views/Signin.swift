@@ -36,8 +36,7 @@ struct BackgroundImage: View {
 
 
 struct InputField: View {
-    @State private var email = ""
-    @State private var password = ""
+    @StateObject private var authVM = AuthViewModel()
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -56,26 +55,35 @@ struct InputField: View {
             Spacer().frame(height: 32)
             VStack(spacing: 20) {
                 StyledInputField(
-                    title: "Email",
-                    placeholder: "test@email.com",
-                    text: $email,
-                    isSecure: false
-                )
+                     title: "Email",
+                     placeholder: "test@email.com",
+                     text: $authVM.email,
+                     isSecure: false,
+                     showError: authVM.hasError
+                 ) {
+                     authVM.clearError()
+                 }
 
-                StyledInputField(
-                    title: "Password",
-                    placeholder: "123456",
-                    text: $password,
-                    isSecure: true
-                )
-                
+                 StyledInputField(
+                     title: "Password",
+                     placeholder: "123456",
+                     text: $authVM.password,
+                     isSecure: true,
+                     showError: authVM.hasError
+                 ) {
+                     authVM.clearError()
+                 }
                 
             }
             Spacer().frame(height: 41)
 
             SigninButton(
-                isEnabled: !email.isEmpty && !password.isEmpty
-            )
+                isEnabled: !authVM.email.isEmpty && !authVM.password.isEmpty
+            ) {
+                Task {
+                    await authVM.signIn()
+                }
+            }
         }
     }
 }
@@ -86,8 +94,20 @@ struct StyledInputField: View {
     let placeholder: String
     @Binding var text: String
     let isSecure: Bool
+    let showError: Bool
+    let onEdit: () -> Void
 
     @FocusState private var isFocused: Bool
+
+    private var borderColor: Color {
+        if showError {
+            return .red
+        } else if isFocused {
+            return .yellow
+        } else {
+            return .clear
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -105,6 +125,8 @@ struct StyledInputField: View {
                         TextField(placeholder, text: $text)
                             .focused($isFocused)
                     }
+                }.onChange(of: text) { _ in
+                    onEdit()
                 }
                 .padding()
                 .frame(width: 358, height: 44)
@@ -112,10 +134,7 @@ struct StyledInputField: View {
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(
-                            isFocused ? Color.yellow : Color.clear,
-                            lineWidth: 2
-                        )
+                        .stroke(borderColor, lineWidth: 2)
                 )
                 .foregroundColor(.white)
                 .accentColor(.yellow)
@@ -133,11 +152,10 @@ struct StyledInputField: View {
 
 struct SigninButton: View {
     let isEnabled: Bool
+    let action: () -> Void
 
     var body: some View {
-        Button(action: {
-            print("Signed in")
-        }) {
+        Button(action: action) {
             Text("Sign in")
                 .font(.headline)
                 .foregroundColor(isEnabled ? .black : .white)

@@ -1,17 +1,25 @@
+//
+//  AuthViewModel.swift
+//  Movieisme
+//
+//  Created by Suhaylah hawsawi on 09/07/1447 AH.
+//
+
+import SwiftUI
+import Combine
+
 @MainActor
 class AuthViewModel: ObservableObject {
 
     @Published var email = ""
     @Published var password = ""
 
-    @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var currentUser: User?
 
     func signIn() async {
         guard !email.isEmpty, !password.isEmpty else { return }
 
-        isLoading = true
         errorMessage = nil
 
         do {
@@ -32,12 +40,22 @@ class AuthViewModel: ObservableObject {
                 currentUser = user
             } else {
                 errorMessage = "Invalid email or password"
+                
             }
 
         } catch {
             errorMessage = "Failed to login"
         }
+        print(errorMessage)
 
-        isLoading = false
     }
+    
+    var hasError: Bool {
+        errorMessage != nil
+    }
+
+    func clearError() {
+        errorMessage = nil
+    }
+
 }
