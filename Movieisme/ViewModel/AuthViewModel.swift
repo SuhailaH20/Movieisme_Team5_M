@@ -23,21 +23,27 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let url = URL(
-                string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users"
-            )!
+
+            let formula =
+            "AND(LOWER(email) = '\(email.lowercased())', password = '\(password)')"
+
+            guard let encodedFormula = formula.addingPercentEncoding(
+                withAllowedCharacters: .urlQueryAllowed
+            ) else {
+                errorMessage = "Invalid credentials format"
+                return
+            }
+
+            let urlString =
+            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users?filterByFormula=\(encodedFormula)"
+
+            let url = URL(string: urlString)!
 
             let data = try await APIClient.fetch(url)
             let decoded = try JSONDecoder().decode(UsersResponse.self, from: data)
 
-            if let user = decoded.records
-                .map({ $0.fields })
-                .first(where: {
-                    $0.email.lowercased() == email.lowercased()
-                    && $0.password == password
-                }) {
-
-                currentUser = user
+            if let record = decoded.records.first {
+                currentUser = record.fields
             } else {
                 errorMessage = "Invalid email or password"
                 
