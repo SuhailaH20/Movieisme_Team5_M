@@ -52,7 +52,7 @@ class AuthViewModel: ObservableObject {
         } catch {
             errorMessage = "Failed to login"
         }
-        print(errorMessage)
+        print("error Message\(String(describing: errorMessage))")
 
     }
     

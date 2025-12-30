@@ -8,12 +8,19 @@
 import SwiftUI
 
 struct SigninPage: View {
+    @StateObject private var authVM = AuthViewModel()
+
     var body: some View {
-      
-        ZStack{
-            BackgroundImage()
-            InputField()
+        NavigationStack {
+            InputField(authVM: authVM)
             
+
+                .background {
+                    BackgroundImage()
+                }
+                .navigationDestination(isPresented: .constant(authVM.currentUser != nil)) {
+                    MoviesCenterView()
+                }
         }
         
     }
@@ -36,7 +43,7 @@ struct BackgroundImage: View {
 
 
 struct InputField: View {
-    @StateObject private var authVM = AuthViewModel()
+    @ObservedObject var authVM: AuthViewModel
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -55,25 +62,24 @@ struct InputField: View {
             Spacer().frame(height: 32)
             VStack(spacing: 20) {
                 StyledInputField(
-                     title: "Email",
-                     placeholder: "test@email.com",
-                     text: $authVM.email,
-                     isSecure: false,
-                     showError: authVM.hasError
-                 ) {
-                     authVM.clearError()
-                 }
+                    title: "Email",
+                    placeholder: "test@email.com",
+                    text: $authVM.email,
+                    isSecure: false,
+                    showError: authVM.hasError
+                ) {
+                    authVM.clearError()
+                }
 
-                 StyledInputField(
-                     title: "Password",
-                     placeholder: "123456",
-                     text: $authVM.password,
-                     isSecure: true,
-                     showError: authVM.hasError
-                 ) {
-                     authVM.clearError()
-                 }
-                
+                StyledInputField(
+                    title: "Password",
+                    placeholder: "123456",
+                    text: $authVM.password,
+                    isSecure: true,
+                    showError: authVM.hasError
+                ) {
+                    authVM.clearError()
+                }
             }
             Spacer().frame(height: 41)
 
