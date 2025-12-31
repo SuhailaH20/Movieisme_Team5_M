@@ -104,6 +104,7 @@ struct StyledInputField: View {
     let onEdit: () -> Void
 
     @FocusState private var isFocused: Bool
+    @State private var isPasswordVisible = false
 
     private var borderColor: Color {
         if showError {
@@ -124,14 +125,15 @@ struct StyledInputField: View {
 
             ZStack(alignment: .trailing) {
                 Group {
-                    if isSecure {
+                    if isSecure && !isPasswordVisible {
                         SecureField(placeholder, text: $text)
                             .focused($isFocused)
                     } else {
                         TextField(placeholder, text: $text)
                             .focused($isFocused)
                     }
-                }.onChange(of: text) { _ in
+                }
+                .onChange(of: text) { _ in
                     onEdit()
                 }
                 .padding()
@@ -146,9 +148,13 @@ struct StyledInputField: View {
                 .accentColor(.yellow)
 
                 if isSecure {
-                    Image(systemName: "eye.slash")
-                        .foregroundColor(.gray)
-                        .padding(.trailing, 12)
+                    Button {
+                        isPasswordVisible.toggle()
+                    } label: {
+                        Image(systemName: isPasswordVisible ? "eye" : "eye.slash")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.trailing, 12)
                 }
             }
         }
