@@ -75,8 +75,15 @@ struct MovieDetails: View {
                        .foregroundStyle(Color(.yellow))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundStyle(Color(.yellow))
+                    if let movie = viewModel.movie {
+                        ShareLink(
+                            item: "Watch with me \(movie.name)!🍿"
+                        ) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundStyle(.yellow)
+                        }
+                    }
+
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Image(systemName: "bookmark")
