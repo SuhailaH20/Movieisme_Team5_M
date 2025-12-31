@@ -11,6 +11,8 @@ struct MovieDetails: View {
     @StateObject var viewModel = MovieDetailsViewModel()
     let movieID: String
 
+    @State private var showTitle = false
+
     var body: some View {
         NavigationStack {
             Group {
@@ -19,6 +21,14 @@ struct MovieDetails: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let movie = viewModel.movie {
                     ScrollView {
+                        GeometryReader { geo in
+                            Color.clear
+                                .onChange(of: geo.frame(in: .global).minY) { value in
+                                    showTitle = value < -80
+                                }
+                        }
+                        .frame(height: 0)
+
                         CoverImage(urlString: movie.poster)
 
                         VStack(alignment: .leading) {
@@ -72,8 +82,17 @@ struct MovieDetails: View {
                 
                ToolbarItem(placement: .navigationBarLeading) {
                     Image(systemName: "chevron.left")
-                       .foregroundStyle(Color(.yellow))
+                        .foregroundStyle(Color(.yellow))
                 }
+
+                ToolbarItem(placement: .principal) {
+                    if showTitle, let movie = viewModel.movie {
+                        Text(movie.name)
+                            .font(.headline)
+                            .lineLimit(1)
+                    }
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if let movie = viewModel.movie {
                         ShareLink(
