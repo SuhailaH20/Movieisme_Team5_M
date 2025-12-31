@@ -280,8 +280,12 @@ struct RatingandReview: View {
                 Text("No reviews yet")
                     .foregroundColor(.gray)
             } else {
-                ForEach(viewModel.reviews) { review in
-                    ReviewCard(review: review)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 20){
+                        ForEach(viewModel.reviews) { review in
+                            ReviewCard(review: review)
+                        }
+                    }
                 }
             }
         }
