@@ -23,9 +23,7 @@ class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-
-            let formula =
-            "AND(LOWER(email) = '\(email.lowercased())', password = '\(password)')"
+            let formula = "AND(LOWER(email) = '\(email.lowercased())', password = '\(password)')"
 
             guard let encodedFormula = formula.addingPercentEncoding(
                 withAllowedCharacters: .urlQueryAllowed
@@ -34,9 +32,7 @@ class AuthViewModel: ObservableObject {
                 return
             }
 
-            let urlString =
-            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users?filterByFormula=\(encodedFormula)"
-
+            let urlString = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users?filterByFormula=\(encodedFormula)"
             let url = URL(string: urlString)!
 
             let data = try await APIClient.fetch(url)
@@ -46,14 +42,12 @@ class AuthViewModel: ObservableObject {
                 currentUser = record.fields
             } else {
                 errorMessage = "Invalid email or password"
-                
             }
 
         } catch {
             errorMessage = "Failed to login"
         }
         print("error Message\(String(describing: errorMessage))")
-
     }
     
     var hasError: Bool {
@@ -63,5 +57,4 @@ class AuthViewModel: ObservableObject {
     func clearError() {
         errorMessage = nil
     }
-
 }

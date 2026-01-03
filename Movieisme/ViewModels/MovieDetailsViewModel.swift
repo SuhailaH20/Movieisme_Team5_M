@@ -30,9 +30,10 @@ class MovieDetailsViewModel: ObservableObject {
             // 2. Load director
             await loadDirector(movieID: id)
 
-            // Load actors
+            // 3. Load actors
             await loadActors(movieID: id)
             
+            // 4. Load reviews
             await loadReviews(movieID: id)
 
         } catch {
@@ -44,9 +45,7 @@ class MovieDetailsViewModel: ObservableObject {
 
     private func loadDirector(movieID: String) async {
         do {
-            let urlString =
-            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
-
+            let urlString = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
             let data = try await APIClient.fetch(URL(string: urlString)!)
             
             // decode ONLY director_id
@@ -57,16 +56,12 @@ class MovieDetailsViewModel: ObservableObject {
 
             guard let directorID else { return }
 
-            // 3. Fetch director details
-            let directorURL =
-            URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/directors/\(directorID)")!
-
+            // Fetch director details
+            let directorURL = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/directors/\(directorID)")!
             let directorData = try await APIClient.fetch(directorURL)
 
-            let directorJSON =
-                try JSONSerialization.jsonObject(with: directorData) as? [String: Any]
-            let directorFields =
-                directorJSON?["fields"] as? [String: Any]
+            let directorJSON = try JSONSerialization.jsonObject(with: directorData) as? [String: Any]
+            let directorFields = directorJSON?["fields"] as? [String: Any]
 
             let name = directorFields?["name"] as? String ?? ""
             let image = directorFields?["image"] as? String ?? ""
@@ -80,16 +75,14 @@ class MovieDetailsViewModel: ObservableObject {
     
     private func loadActors(movieID: String) async {
         do {
-            let urlString =
-            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/movie_actors?filterByFormula=movie_id=\"\(movieID)\""
-            
+            let urlString = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/movie_actors?filterByFormula=movie_id=\"\(movieID)\""
             let data = try await APIClient.fetch(URL(string: urlString)!)
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             let records = json?["records"] as? [[String: Any]] ?? []
 
             // Get all actor IDs
             let actorIDs: [String] = records.compactMap { $0["fields"] as? [String: Any] }
-                                              .compactMap { $0["actor_id"] as? String }
+                                            .compactMap { $0["actor_id"] as? String }
 
             var tempActors: [Actor] = []
 
@@ -114,9 +107,7 @@ class MovieDetailsViewModel: ObservableObject {
 
     private func loadReviews(movieID: String) async {
         do {
-            let urlString =
-            "https://api.airtable.com/v0/appsfcB6YESLj4NCN/reviews?filterByFormula=movie_id=\"\(movieID)\""
-
+            let urlString = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/reviews?filterByFormula=movie_id=\"\(movieID)\""
             let data = try await APIClient.fetch(URL(string: urlString)!)
 
             struct ReviewResponse: Codable {
@@ -124,13 +115,10 @@ class MovieDetailsViewModel: ObservableObject {
             }
 
             let decoded = try JSONDecoder().decode(ReviewResponse.self, from: data)
-
             var tempReviews: [MovieReview] = []
 
             for record in decoded.records {
-                let userURL =
-                URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/\(record.fields.user_id)")!
-
+                let userURL = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/\(record.fields.user_id)")!
                 let userData = try await APIClient.fetch(userURL)
                 let userRecord = try JSONDecoder().decode(UserRecord.self, from: userData)
 
@@ -141,7 +129,6 @@ class MovieDetailsViewModel: ObservableObject {
                     text: record.fields.review_text,
                     rating: record.fields.rate
                 )
-
                 tempReviews.append(review)
             }
 
@@ -151,5 +138,30 @@ class MovieDetailsViewModel: ObservableObject {
             print("Reviews error:", error)
         }
     }
-
+    
+    // Save Movie Feature
+    func saveMovie(movieID: String) async {
+        isLoading = true
+        do {
+            let url = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies")!
+            
+            // TEMPORARY USER ID, we should replace it with real user ID from AuthViewModel
+            let currentUserID = "XXXXXXXXXXXXXX"
+            
+            let body: [String: Any] = [
+                "fields": [
+                    "user_id": [currentUserID],
+                    "movie_id": [movieID]
+                ]
+            ]
+            
+            try await APIClient.post(url, body: body)
+            print("Movie saved successfully!")
+            
+        } catch {
+            print("Failed to save movie: \(error)")
+            errorMessage = "Failed to save movie."
+        }
+        isLoading = false
+    }
 }

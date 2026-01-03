@@ -1,31 +1,11 @@
 //
-//  ContentView.swift
+//  SigninComponents.swift
 //  Movieisme
 //
 //  Created by Suhaylah hawsawi on 03/07/1447 AH.
 //
 
 import SwiftUI
-
-struct SigninPage: View {
-    @StateObject private var authVM = AuthViewModel()
-
-    var body: some View {
-        NavigationStack {
-            InputField(authVM: authVM)
-            
-
-                .background {
-                    BackgroundImage()
-                }
-                .navigationDestination(isPresented: .constant(authVM.currentUser != nil)) {
-                    MoviesCenterView()
-                }
-        }
-        
-    }
-}
-
 
 struct BackgroundImage: View {
     var body: some View {
@@ -41,7 +21,6 @@ struct BackgroundImage: View {
     }
 }
 
-
 struct InputField: View {
     @ObservedObject var authVM: AuthViewModel
 
@@ -53,12 +32,11 @@ struct InputField: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
-                
-
+            
             Text("You'll find what you're looking for in the \n ocean of movies")
                 .font(.body)
                 .foregroundColor(.white)
-               
+                
             Spacer().frame(height: 32)
             VStack(spacing: 20) {
                 StyledInputField(
@@ -94,7 +72,6 @@ struct InputField: View {
     }
 }
 
-
 struct StyledInputField: View {
     let title: String
     let placeholder: String
@@ -107,13 +84,9 @@ struct StyledInputField: View {
     @State private var isPasswordVisible = false
 
     private var borderColor: Color {
-        if showError {
-            return .red
-        } else if isFocused {
-            return .yellow
-        } else {
-            return .clear
-        }
+        if showError { return .red }
+        else if isFocused { return .yellow }
+        else { return .clear }
     }
 
     var body: some View {
@@ -126,16 +99,12 @@ struct StyledInputField: View {
             ZStack(alignment: .trailing) {
                 Group {
                     if isSecure && !isPasswordVisible {
-                        SecureField(placeholder, text: $text)
-                            .focused($isFocused)
+                        SecureField(placeholder, text: $text).focused($isFocused)
                     } else {
-                        TextField(placeholder, text: $text)
-                            .focused($isFocused)
+                        TextField(placeholder, text: $text).focused($isFocused)
                     }
                 }
-                .onChange(of: text) { _ in
-                    onEdit()
-                }
+                .onChange(of: text) { _ in onEdit() }
                 .padding()
                 .frame(width: 358, height: 44)
                 .background(Color.gray.opacity(0.26))
@@ -161,7 +130,6 @@ struct StyledInputField: View {
     }
 }
 
-
 struct SigninButton: View {
     let isEnabled: Bool
     let action: () -> Void
@@ -177,8 +145,4 @@ struct SigninButton: View {
         }
         .disabled(!isEnabled)
     }
-}
-
-#Preview {
-    SigninPage()
 }

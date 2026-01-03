@@ -1,5 +1,5 @@
 //
-//  ProfileUIComponents.swift
+//  ProfileComponents.swift
 //  Movieisme
 //
 //  Created by شهد عبدالله القحطاني on 08/07/1447 AH.
@@ -7,6 +7,42 @@
 
 import SwiftUI
 
+// MARK: - User Info Card
+struct UserInfoCardView: View {
+    let fullName: String
+    let email: String
+    let imageName: String
+
+    var body: some View {
+        HStack(spacing: 14) {
+            ProfileAvatarView(imageName: imageName, size: 64)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(fullName)
+                    .foregroundStyle(.white)
+                    .font(.system(size: 18, weight: .semibold))
+
+                Text(email)
+                    .foregroundStyle(.white.opacity(0.75))
+                    .font(.system(size: 14, weight: .regular))
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundStyle(.white.opacity(0.6))
+                .font(.system(size: 14, weight: .semibold))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(.secondarySystemBackground))
+        )
+    }
+}
+
+// MARK: - Profile Screen Containers
 struct ProfileScreen<Content: View, Trailing: View>: View {
     let title: String
     @ViewBuilder var trailing: Trailing
@@ -76,6 +112,7 @@ struct ProfileScreenNoTrailing<Content: View>: View {
     }
 }
 
+// MARK: - Info Rows & Cards
 struct ProfileInfoCard<Content: View>: View {
     @ViewBuilder var content: Content
 
@@ -101,14 +138,12 @@ struct ProfileInfoRow: View {
 
     var body: some View {
         ZStack {
-            
             HStack {
                 Text(title)
                     .profileRowTitle()
                 Spacer()
             }
 
-    
             Text(value)
                 .profileRowValue()
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -118,20 +153,19 @@ struct ProfileInfoRow: View {
     }
 }
 
-
 struct ProfileTextFieldRow: View {
     let title: String
     @Binding var text: String
 
     var body: some View {
         ZStack {
-            // العنوان يسار
+            // Title Left
             HStack {
                 Text(title).profileRowTitle()
                 Spacer()
             }
 
-            // التكست فيلد بالوسط
+            // TextField Center
             TextField("", text: $text)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.white)
@@ -139,14 +173,14 @@ struct ProfileTextFieldRow: View {
                 .textInputAutocapitalization(.words)
                 .autocorrectionDisabled(true)
                 .keyboardType(.default)
-                .frame(maxWidth: 200) // تقدرين تكبرينها إذا تبين
+                .frame(maxWidth: 200)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
     }
 }
 
-// Avatar
+// MARK: - Avatar
 struct ProfileAvatarView: View {
     let imageName: String
     var size: CGFloat = 80
@@ -177,7 +211,7 @@ struct ProfileAvatarView: View {
     }
 }
 
-// Sign Out
+// MARK: - Buttons
 struct ProfileDangerButton: View {
     let title: String
     var action: () -> Void
@@ -199,29 +233,26 @@ struct ProfileDangerButton: View {
     }
 }
 
+// MARK: - Extensions
 extension View {
     func profileDivider() -> some View {
-        self
-            .overlay(Color.black.opacity(0.15))
+        self.overlay(Color.black.opacity(0.15))
     }
 }
 
 extension Text {
     func profileNavTitle() -> some View {
-        self
-            .foregroundStyle(.white)
+        self.foregroundStyle(.white)
             .font(.system(size: 16, weight: .semibold))
     }
 
     func profileRowTitle() -> some View {
-        self
-            .foregroundStyle(.white.opacity(0.75))
+        self.foregroundStyle(.white.opacity(0.75))
             .font(.system(size: 15, weight: .regular))
     }
 
     func profileRowValue() -> some View {
-        self
-            .foregroundStyle(.white)
+        self.foregroundStyle(.white)
             .font(.system(size: 15, weight: .semibold))
     }
 }

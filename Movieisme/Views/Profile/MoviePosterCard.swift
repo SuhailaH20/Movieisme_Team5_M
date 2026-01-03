@@ -1,5 +1,5 @@
 //
-//  moviePoster.swift
+//  MoviePosterCard.swift
 //  Movieisme
 //
 //  Created by شهد عبدالله القحطاني on 04/07/1447 AH.
@@ -7,14 +7,15 @@
 
 import SwiftUI
 
-extension ProfileView {
+struct MoviePosterCard: View {
+    let imageName: String
 
-    func moviePoster(_ imageName: String) -> some View {
+    var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 7)
                 .fill(Color.white.opacity(0.08))
 
-            Image(imageName) 
+            Image(imageName)
                 .resizable()
                 .scaledToFill()
         }
@@ -26,9 +27,3 @@ extension ProfileView {
         )
     }
 }
-
-#Preview {
-    ProfileView()
-        .preferredColorScheme(.dark)
-}
-

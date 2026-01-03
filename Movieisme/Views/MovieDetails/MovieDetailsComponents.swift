@@ -1,123 +1,11 @@
 //
-//  MovieDetails.swift
+//  MovieDetailsComponents.swift
 //  Movieisme
 //
 //  Created by Suhaylah hawsawi on 04/07/1447 AH.
 //
 
 import SwiftUI
-
-struct MovieDetails: View {
-    @StateObject var viewModel = MovieDetailsViewModel()
-    let movieID: String
-
-    @State private var showTitle = false
-
-    var body: some View {
-        NavigationStack {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView("Loading...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let movie = viewModel.movie {
-                    ScrollView {
-                        GeometryReader { geo in
-                            Color.clear
-                                .onChange(of: geo.frame(in: .global).minY) { value in
-                                    showTitle = value < -80
-                                }
-                        }
-                        .frame(height: 0)
-
-                        CoverImage(urlString: movie.poster)
-
-                        VStack(alignment: .leading) {
-                            Text(movie.name)
-                                .font(.system(size: 28, weight: .bold))
-                            Spacer().frame(height: 20)
-
-                            MovieOverview(movie: movie)
-                            Spacer().frame(height: 32)
-
-                            StorySection(movie: movie)
-                            Spacer().frame(height: 32)
-
-                            RatingSection(rating: movie.IMDb_rating)
-                            
-                            Divider()
-                                .background(Color.gray)
-                                .padding(.vertical, 8)
-                            
-                            if let director = viewModel.director {
-                                DirectorSection(director: director)
-                            }
-
-                            Spacer().frame(height: 16)
-                            
-                            if !viewModel.actors.isEmpty {
-                                StarSection(actors: viewModel.actors)
-                            }
-
-                            
-                            Divider()
-                                .background(Color.gray)
-                                .padding(.vertical, 8)
-                            
-                            RatingandReview(viewModel: viewModel)
-
-                        }
-                        .padding(.horizontal)
-                    }
-                } else if let error = viewModel.errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                } else {
-                    Text("No data")
-                        .foregroundColor(.gray)
-                }
-            }
-            .toolbar {
-                
-               ToolbarItem(placement: .navigationBarLeading) {
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(Color(.yellow))
-                }
-
-                ToolbarItem(placement: .principal) {
-                    if showTitle, let movie = viewModel.movie {
-                        Text(movie.name)
-                            .font(.headline)
-                            .lineLimit(1)
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if let movie = viewModel.movie {
-                        ShareLink(
-                            item: "Watch with me \(movie.name)!🍿"
-                        ) {
-                            Image(systemName: "square.and.arrow.up")
-                                .foregroundStyle(.yellow)
-                        }
-                    }
-
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "bookmark")
-                        .foregroundStyle(Color(.yellow))
-                }
-            }
-           
-            .task {
-                await viewModel.loadMovie(id: movieID)
-            }
-        }
-    }
-}
-
-
 
 struct CoverImage: View {
     let urlString: String
@@ -126,21 +14,20 @@ struct CoverImage: View {
         AsyncImage(url: URL(string: urlString)) { phase in
             if let image = phase.image {
                 ZStack{
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .padding(.top, -100)
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .padding(.top, -100)
                 
-                
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.black.opacity(0.999),
-                        Color.black.opacity(0)
-                    ]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-            } .frame(maxHeight: 300)
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.black.opacity(0.999),
+                            Color.black.opacity(0)
+                        ]),
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                } .frame(maxHeight: 300)
             }
         }
     }
@@ -341,7 +228,7 @@ struct ReviewCard: View {
                         .font(.subheadline)
                         .fontWeight(.semibold)
 
-                   
+                    
                     HStack(spacing: 2) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < review.rating ? "star.fill" : "star")
@@ -375,9 +262,4 @@ struct ReviewCard: View {
         .background(Color.white.opacity(0.09))
         .cornerRadius(8)
     }
-}
-
-
-#Preview {
-    MovieDetails(movieID: "reckJmZ458CZcLlUd")
 }

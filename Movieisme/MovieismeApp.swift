@@ -11,7 +11,7 @@ import SwiftUI
 struct MovieismeApp: App {
     var body: some Scene {
         WindowGroup {
-            SigninPage()
+            Signin()
         }
     }
 }
