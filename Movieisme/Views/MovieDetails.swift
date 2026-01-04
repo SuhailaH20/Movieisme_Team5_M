@@ -2,16 +2,18 @@
 //  MovieDetails.swift
 //  Movieisme
 //
-//  Created by Suhaylah hawsawi on 04/07/1447 AH.
-//
 
 import SwiftUI
 
 struct MovieDetails: View {
     @StateObject var viewModel = MovieDetailsViewModel()
     let movieID: String
-
+    
+    // ضع الـ userID الخاص بالمستخدم الحالي - يمكن تمريره من الـ Authentication
+    let currentUserID: String = "rec9fbIQzzfNumaav" // غيّر هذا حسب نظام الـ Authentication عندك
+    
     @State private var showTitle = false
+    @State private var showAddReview = false
 
     var body: some View {
         NavigationStack {
@@ -57,14 +59,17 @@ struct MovieDetails: View {
                             if !viewModel.actors.isEmpty {
                                 StarSection(actors: viewModel.actors)
                             }
-
                             
                             Divider()
                                 .background(Color.gray)
                                 .padding(.vertical, 8)
                             
-                            RatingandReview(viewModel: viewModel)
-
+                            RatingandReview(
+                                viewModel: viewModel,
+                                onWriteReview: {
+                                    showAddReview = true
+                                }
+                            )
                         }
                         .padding(.horizontal)
                     }
@@ -79,8 +84,7 @@ struct MovieDetails: View {
                 }
             }
             .toolbar {
-                
-               ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(Color(.yellow))
                 }
@@ -95,29 +99,36 @@ struct MovieDetails: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if let movie = viewModel.movie {
-                        ShareLink(
-                            item: "Watch with me \(movie.name)!🍿"
-                        ) {
+                        ShareLink(item: "Watch with me \(movie.name)!🍿") {
                             Image(systemName: "square.and.arrow.up")
                                 .foregroundStyle(.yellow)
                         }
                     }
-
                 }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Image(systemName: "bookmark")
                         .foregroundStyle(Color(.yellow))
                 }
             }
-           
             .task {
                 await viewModel.loadMovie(id: movieID)
+            }
+            .sheet(isPresented: $showAddReview) {
+                let currentMovieID = movieID
+                AddReviewView(
+                    movieID: currentMovieID,
+                    userID: currentUserID,
+                    onAdded: {
+                        Task {
+                            await viewModel.loadReviews(movieID: movieID)
+                        }
+                    }
+                )
             }
         }
     }
 }
-
-
 
 struct CoverImage: View {
     let urlString: String
@@ -125,22 +136,22 @@ struct CoverImage: View {
     var body: some View {
         AsyncImage(url: URL(string: urlString)) { phase in
             if let image = phase.image {
-                ZStack{
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .padding(.top, -100)
-                
-                
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.black.opacity(0.999),
-                        Color.black.opacity(0)
-                    ]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-            } .frame(maxHeight: 300)
+                ZStack {
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .padding(.top, -100)
+                    
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.black.opacity(0.999),
+                            Color.black.opacity(0)
+                        ]),
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                }
+                .frame(maxHeight: 300)
             }
         }
     }
@@ -150,13 +161,12 @@ struct MovieOverview: View {
     let movie: Movie
     
     var body: some View {
-        
         LazyVGrid(columns: [
-            GridItem(.fixed(119),spacing: 70),
-            GridItem(.fixed(119),spacing: 70)
-        ],alignment: .leading,  spacing: 32){
+            GridItem(.fixed(119), spacing: 70),
+            GridItem(.fixed(119), spacing: 70)
+        ], alignment: .leading, spacing: 32) {
             
-            VStack(alignment: .leading, spacing: 8){
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Duration")
                     .font(.system(size: 18, weight: .semibold))
                 
@@ -165,24 +175,22 @@ struct MovieOverview: View {
                     .foregroundColor(Color("greyish"))
             }
             
-            VStack(alignment: .leading, spacing: 8){
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Language")
                     .font(.system(size: 18, weight: .semibold))
                 
                 Text("\(movie.language.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
-                
             }
             
-            VStack(alignment: .leading, spacing: 8){
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Genre")
                     .font(.system(size: 18, weight: .semibold))
                 
                 Text("\(movie.genre.joined(separator: ", "))")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color("greyish"))
-                
             }
             
             VStack(alignment: .leading, spacing: 8) {
@@ -191,7 +199,7 @@ struct MovieOverview: View {
                 
                 Text("\(movie.rating)")
                     .font(.system(size: 15, weight: .medium))
-                .foregroundColor(Color("greyish"))
+                    .foregroundColor(Color("greyish"))
             }
         }
     }
@@ -201,13 +209,12 @@ struct StorySection: View {
     let movie: Movie
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("Story")
                 .font(.system(size: 18, weight: .semibold))
             Text(movie.story)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(Color("greyish"))
-   
         }
     }
 }
@@ -216,14 +223,13 @@ struct RatingSection: View {
     let rating: Double
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("IMDb Rating")
                 .font(.system(size: 18, weight: .semibold))
             
             Text(String(format: "%.1f / 10", rating))
                 .font(.system(size: 15))
                 .foregroundColor(Color("greyish"))
-    
         }
     }
 }
@@ -255,7 +261,7 @@ struct StarSection: View {
     let actors: [Actor]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("Stars")
                 .font(.system(size: 18, weight: .semibold))
 
@@ -277,7 +283,6 @@ struct StarSection: View {
                         }
                     }
                 }
-
             }
         }
     }
@@ -285,14 +290,14 @@ struct StarSection: View {
 
 struct RatingandReview: View {
     @ObservedObject var viewModel: MovieDetailsViewModel
+    let onWriteReview: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Rating & Reviews")
                 .font(.system(size: 18, weight: .semibold))
             
-            //how can i make this dynamic????
-            Text("4.8")
+            Text(String(format: "%.1f", viewModel.averageRating))
                 .font(.system(size: 39, weight: .medium))
                 .foregroundColor(Color("greyish"))
             
@@ -303,30 +308,59 @@ struct RatingandReview: View {
             Spacer().frame(height: 20)
             
             if viewModel.reviews.isEmpty {
-                Text("No reviews yet")
-                    .foregroundColor(.gray)
+                VStack(spacing: 16) {
+                    Text("No reviews yet")
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 8)
+                    
+                    Button(action: onWriteReview) {
+                        HStack {
+                            Image(systemName: "square.and.pencil")
+                            Text("Write a review")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.yellow)
+                        .foregroundColor(.black)
+                        .cornerRadius(8)
+                    }
+                }
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 20){
+                    HStack(spacing: 20) {
                         ForEach(viewModel.reviews) { review in
                             ReviewCard(review: review)
                         }
                     }
+                }
+                
+                Spacer().frame(height: 16)
+                
+                Button(action: onWriteReview) {
+                    HStack {
+                        Image(systemName: "square.and.pencil")
+                        Text("Write a review")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.yellow.opacity(0.1))
+                    .foregroundColor(.yellow)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.yellow, lineWidth: 1)
+                    )
                 }
             }
         }
     }
 }
 
-
 struct ReviewCard: View {
     let review: MovieReview
-    //not dynamic yet i need to build a func to map or translate the data into something similr to this format
-    let date: String = "2 days ago"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-
             HStack(alignment: .top, spacing: 12) {
                 AsyncImage(url: URL(string: review.authorImage)) { image in
                     image.resizable().scaledToFill()
@@ -341,7 +375,6 @@ struct ReviewCard: View {
                         .font(.subheadline)
                         .fontWeight(.semibold)
 
-                   
                     HStack(spacing: 2) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < review.rating ? "star.fill" : "star")
@@ -360,24 +393,15 @@ struct ReviewCard: View {
                 .lineLimit(4)
 
             Spacer()
-
-            HStack {
-                Spacer()
-                
-                
-                Text(date)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
         }
-        .frame(width: 350, height: 180)
+        .frame(width: 350, height: 160)
         .padding()
         .background(Color.white.opacity(0.09))
         .cornerRadius(8)
     }
 }
 
-
 #Preview {
     MovieDetails(movieID: "reckJmZ458CZcLlUd")
 }
+

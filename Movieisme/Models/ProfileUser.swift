@@ -4,6 +4,7 @@
 //
 //  Created by شهد عبدالله القحطاني on 08/07/1447 AH.
 
+
 import Foundation
 
 struct ProfileUser {
@@ -11,8 +12,8 @@ struct ProfileUser {
     var lastName: String
     var email: String
     var imageName: String
-
-    var fullName: String { "\(firstName) \(lastName)" }
+    
+    var fullName: String {
+        "\(firstName) \(lastName)"
+    }
 }
-
-
