@@ -1,9 +1,3 @@
-//
-//  MoviesCenterViewModel.swift
-//  Movieisme
-//
-//  Created by Dana on 12/07/1447 AH.
-//
 
 import Foundation
 import Combine
@@ -23,7 +17,6 @@ class MoviesCenterViewModel: ObservableObject {
             
             let data = try await APIClient.fetch(url)
             
-            // Uses the wrapper now located in Movie.swift
             let response = try JSONDecoder().decode(MovieResponseWrapper.self, from: data)
             self.movies = response.records
             

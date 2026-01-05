@@ -1,9 +1,3 @@
-//
-//  Cast.swift
-//  Movieisme
-//
-//  Created by Suhaylah hawsawi on 06/07/1447 AH.
-//
 
 import Foundation
 

@@ -1,8 +1,3 @@
-//
-//  ProfileUser.swift
-//  Movieisme
-//
-//  Created by شهد عبدالله القحطاني on 08/07/1447 AH.
 
 import Foundation
 

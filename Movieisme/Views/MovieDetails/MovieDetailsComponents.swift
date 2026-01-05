@@ -1,9 +1,3 @@
-//
-//  MovieDetailsComponents.swift
-//  Movieisme
-//
-//  Created by Suhaylah hawsawi on 04/07/1447 AH.
-//
 
 import SwiftUI
 
@@ -170,16 +164,17 @@ struct StarSection: View {
     }
 }
 
+
 struct RatingandReview: View {
     @ObservedObject var viewModel: MovieDetailsViewModel
+    let onWriteReview: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Rating & Reviews")
                 .font(.system(size: 18, weight: .semibold))
             
-            //how can i make this dynamic????
-            Text("4.8")
+            Text(String(format: "%.1f", viewModel.averageRating))
                 .font(.system(size: 39, weight: .medium))
                 .foregroundColor(Color("greyish"))
             
@@ -190,8 +185,23 @@ struct RatingandReview: View {
             Spacer().frame(height: 20)
             
             if viewModel.reviews.isEmpty {
-                Text("No reviews yet")
-                    .foregroundColor(.gray)
+                VStack(spacing: 16) {
+                    Text("No reviews yet")
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 8)
+                    
+                    Button(action: onWriteReview) {
+                        HStack {
+                            Image(systemName: "square.and.pencil")
+                            Text("Write a review")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.yellow)
+                        .foregroundColor(.black)
+                        .cornerRadius(8)
+                    }
+                }
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 20){
@@ -200,20 +210,34 @@ struct RatingandReview: View {
                         }
                     }
                 }
+                
+                Spacer().frame(height: 16)
+                
+                Button(action: onWriteReview) {
+                    HStack {
+                        Image(systemName: "square.and.pencil")
+                        Text("Write a review")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.yellow.opacity(0.1))
+                    .foregroundColor(.yellow)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.yellow, lineWidth: 1)
+                    )
+                }
             }
         }
     }
 }
 
-
 struct ReviewCard: View {
     let review: MovieReview
-    //not dynamic yet i need to build a func to map or translate the data into something similr to this format
-    let date: String = "2 days ago"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-
             HStack(alignment: .top, spacing: 12) {
                 AsyncImage(url: URL(string: review.authorImage)) { image in
                     image.resizable().scaledToFill()
@@ -222,42 +246,30 @@ struct ReviewCard: View {
                 }
                 .frame(width: 36, height: 36)
                 .clipShape(Circle())
-
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(review.author)
                         .font(.subheadline)
                         .fontWeight(.semibold)
-
                     
                     HStack(spacing: 2) {
                         ForEach(0..<5) { index in
                             Image(systemName: index < review.rating ? "star.fill" : "star")
-                                .font(.caption)
-                                .foregroundColor(.yellow)
+                                .font(.caption).foregroundColor(.yellow)
                         }
                     }
                 }
-
                 Spacer()
             }
-
+            
             Text(review.text)
                 .font(.footnote)
                 .foregroundColor(.white)
                 .lineLimit(4)
-
+            
             Spacer()
-
-            HStack {
-                Spacer()
-                
-                
-                Text(date)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
         }
-        .frame(width: 350, height: 180)
+        .frame(width: 350, height: 160)
         .padding()
         .background(Color.white.opacity(0.09))
         .cornerRadius(8)

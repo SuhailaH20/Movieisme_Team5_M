@@ -1,9 +1,3 @@
-//
-//  Signin.swift
-//  Movieisme
-//
-//  Created by Suhaylah hawsawi on 03/07/1447 AH.
-//
 
 import SwiftUI
 
