@@ -10,7 +10,9 @@ struct MoviesCenterView: View {
     @State private var showProfile = false
     
     var highRatedMovies: [MovieRecord] {
-        viewModel.movies.filter { $0.fields.IMDb_rating >= 4.5 }
+        viewModel.movies
+            .filter { $0.fields.IMDb_rating >= 4.5 }
+            .sorted { $0.fields.IMDb_rating > $1.fields.IMDb_rating }
     }
     
     func moviesForCategory(_ genre: String) -> [MovieRecord] {
